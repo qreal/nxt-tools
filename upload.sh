@@ -1,5 +1,5 @@
 PATH=$PWD/cygwin/bin:$PATH
-cd $2
+cd "$2"
 make clean    
 make all
 echo Executing NeXTTool to upload $1.rxe...
