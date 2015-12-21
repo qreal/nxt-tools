@@ -1,7 +1,11 @@
-#ifndef trik_studio_utils
-#define trik_studio_utils
+#ifndef TRIK_STUDIO_UTILS_H_
+#define TRIK_STUDIO_UTILS_H_
 
+#include "kernel.h"
+#include "osek_kernel.h"
 
+extern void wait(unsigned long delay);
+extern void ts_dispatch_timers();
 
 extern char *concat(char *str1, char *str2);
 
