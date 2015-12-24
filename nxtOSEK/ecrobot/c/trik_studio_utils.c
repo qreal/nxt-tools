@@ -84,30 +84,57 @@ void ts_dispatch_timers()
 
 // -------------------------- String utils -------------------------- //
 
-char *formatString(char *format, ...)
+char *unsigned_to_string(U32 val, U32 sign)
 {
-	char buffer[256];
-	va_list args;
-	va_start(args, format);
-	vsnprintf(buffer, 256, format, args);
-	va_end(args);
-	return buffer;
+	// Implementation is taken from nxtOSEK\lejos_nxj\src\nxtvm\platform
+	char *x = (char *)malloc(12); // enough for 10 digits + sign + NULL
+
+	char *p = &x[11];
+	int p_count = 0;
+
+
+	*p = 0;
+
+	while (val) {
+		p--;
+		p_count++;
+		*p = (val % 10) + '0';
+		val /= 10;
+	}
+
+	if (!p_count) {
+		p--;
+		p_count++;
+		*p = '0';
+	}
+
+	if (sign) {
+		p--;
+		p_count++;
+		*p = '-';
+	}
+
+	return p;
 }
 
-char *concat(char *str1, char *str2) {
-	char *result = (char *)malloc(strlen(str1) + strlen(str2));
+char *concat(char *str1, char *str2)
+{
+	char *result = (char *)calloc(strlen(str1) + strlen(str2) + 1, sizeof(char));
 	strcpy(result, str1);
 	return strcat(result, str2);
 }
 
-char *int_to_string(int i) {
-	return formatString("%d", i);
+char *int_to_string(int val)
+{
+	return unsigned_to_string((val < 0) ? -val : val, (val < 0));
 }
 
-char *float_to_string(float f) {
-	return formatString("%d.%d", (int)f, ((int)((f - (int)f) * 1000)));
+char *float_to_string(float f)
+{
+	return concat(int_to_string((int)f), unsigned_to_string((int)((f - (int)f) * 1000), 0));
 }
 
-char *other_to_string(void *arr) {
-	return formatString("%p", arr);
+char *other_to_string(void *arr)
+{
+	return int_to_string((int)arr);
 }
