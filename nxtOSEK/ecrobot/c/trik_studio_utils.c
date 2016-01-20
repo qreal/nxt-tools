@@ -84,10 +84,37 @@ void ts_dispatch_timers()
 
 // -------------------------- String utils -------------------------- //
 
+
+#define TS_STRINGS_POOL_SIZE 128
+// A cyclic strings pool. Without it multiple usage of *_to_string() functions may cause out of memory faults.
+char *strings_pool[128];
+U32 current_string = 0;
+U8 need_to_free_pool = 0;
+
+char *alloc_string(U32 length)
+{
+	// TODO: probably honest thread-safety must be implemented here, but tasks are pre-empted only in wait functions in generated code now.
+	// This code unlikely will be pre-empted in the middle.
+	char *result = (char *)malloc(length);
+
+	if (need_to_free_pool)
+		free(strings_pool[current_string]);
+
+	strings_pool[current_string] = result;
+
+	++current_string;
+	if (current_string >= TS_STRINGS_POOL_SIZE) {
+		current_string = 0;
+		need_to_free_pool = 1;
+	}
+
+	return result;
+}
+
 char *unsigned_to_string(U32 val, U32 sign)
 {
-	// Implementation is taken from nxtOSEK\lejos_nxj\src\nxtvm\platform
-	char *x = (char *)malloc(12); // enough for 10 digits + sign + NULL
+	// Implementation is taken from nxtOSEK/lejos_nxj/src/nxtvm/platform
+	char *x = alloc_string(12); // enough for 10 digits + sign + NULL
 
 	char *p = &x[11];
 	int p_count = 0;
@@ -119,7 +146,7 @@ char *unsigned_to_string(U32 val, U32 sign)
 
 char *concat(char *str1, char *str2)
 {
-	char *result = (char *)calloc(strlen(str1) + strlen(str2) + 1, sizeof(char));
+	char *result = alloc_string(strlen(str1) + strlen(str2) + 1);
 	strcpy(result, str1);
 	return strcat(result, str2);
 }
