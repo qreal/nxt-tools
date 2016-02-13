@@ -1,0 +1,58 @@
+;
+;
+; Installs WinUsb
+;
+
+[Version]
+Signature = "$Windows NT$"
+Class     = USBDevice
+ClassGUID = {88BAE032-5A81-49f0-BC3D-A4FF138216D6}
+Provider  = %ManufacturerName%
+CatalogFile = lego_winusb_install.cat
+DriverVer=02/12/2016,13.54.20.543
+
+; ========== Manufacturer/Models sections ===========
+
+[Manufacturer]
+%ManufacturerName% = Standard,NTx86,NTamd64
+
+[Standard.NTx86]
+%DeviceName% =USB_Install, USB\VID_0694&PID_0002
+
+[Standard.NTamd64]
+%DeviceName% =USB_Install, USB\VID_0694&PID_0002
+
+; ========== Class definition ===========
+
+[ClassInstall32]
+AddReg = ClassInstall_AddReg
+
+[ClassInstall_AddReg]
+HKR,,,,%ClassName%
+HKR,,NoInstallClass,,1
+HKR,,IconPath,%REG_MULTI_SZ%,"%systemroot%\system32\setupapi.dll,-20"
+HKR,,LowerLogoVersion,,5.2
+
+; =================== Installation ===================
+
+[USB_Install]
+Include = winusb.inf
+Needs   = WINUSB.NT
+
+[USB_Install.Services]
+Include = winusb.inf
+Needs   = WINUSB.NT.Services
+
+[USB_Install.HW]
+AddReg=Dev_AddReg
+
+[Dev_AddReg]
+HKR,,DeviceInterfaceGUIDs,0x10000,"{7fd2eff5-cffe-48f8-ae42-d3912010e1f6}"
+
+; =================== Strings ===================
+
+[Strings]
+ManufacturerName="CyberTech Labs Ltd."
+ClassName="Universal Serial Bus devices"
+DeviceName="Lego NXT Brick"
+REG_MULTI_SZ = 0x00010000
