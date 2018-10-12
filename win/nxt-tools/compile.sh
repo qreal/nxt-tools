@@ -1,4 +1,4 @@
-PATH=$PWD/cygwin/bin:$PATH
+PATH="$PWD/cygwin/bin:$PATH"
 cd "$2"
 make clean
 make all
